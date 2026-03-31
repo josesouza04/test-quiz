@@ -1,6 +1,14 @@
 import pytest
 from model import Question
 
+@pytest.fixture
+def multi_choice_question():
+    q = Question(title='q_fixture', max_selections=2)
+    q.add_choice('opt1')
+    q.add_choice('opt2')
+    q.add_choice('opt3')
+    return q
+
 
 def test_create_question():
     question = Question(title='q1')
@@ -105,3 +113,16 @@ def test_points_out_of_bounds_raise():
         Question(title='q1', points=0)
     with pytest.raises(Exception):
         Question(title='q1', points=101)
+
+
+def test_multi_choice_fixture_has_three_choices(multi_choice_question):
+    q = multi_choice_question
+    assert len(q.choices) == 3
+    assert [c.text for c in q.choices] == ['opt1', 'opt2', 'opt3']
+
+
+def test_multi_choice_fixture_correct_selection(multi_choice_question):
+    q = multi_choice_question
+    q.set_correct_choices([2])
+    result = q.correct_selected_choices([2])
+    assert result == [2]
